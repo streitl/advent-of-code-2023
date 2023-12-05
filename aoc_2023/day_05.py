@@ -16,7 +16,7 @@ LEVEL_NAMES: tuple[str, ...] = (
 
 
 @dataclass
-class SubMapping:
+class SubMappingPart:
     dst: int  # destination
     src: int  # source
     rng: int  # range
@@ -37,70 +37,79 @@ class SubMapping:
 
 
 @dataclass
+class SubMapping:
+    parts: tuple[SubMappingPart, ...]
+
+    def forward(self, i: int) -> int:
+        for submapping_part in self.parts:
+            if submapping_part.contains_source(i):
+                return submapping_part.forward(i)
+        return i
+
+    def backward(self, i: int) -> int:
+        for submapping_part in self.parts:
+            if submapping_part.contains_destination(i):
+                return submapping_part.backward(i)
+        return i
+
+
+@dataclass
 class Mapping:
     submappings: tuple[SubMapping, ...]
 
     def forward(self, i: int) -> int:
-        for submapping in self.submappings:
-            if submapping.contains_source(i):
-                return submapping.forward(i)
+        for submapping_part in self.submappings:
+            i = submapping_part.forward(i)
         return i
 
     def backward(self, i: int) -> int:
-        for submapping in self.submappings:
-            if submapping.contains_destination(i):
-                return submapping.backward(i)
+        for submapping_part in self.submappings[::-1]:
+            i = submapping_part.backward(i)
         return i
 
 
-def parse(input: str) -> tuple[tuple[int, ...], tuple[Mapping, ...]]:
+def parse(input: str) -> tuple[tuple[int, ...], Mapping]:
     lines = input.split("\n")
     seeds: tuple[int, ...] = tuple(
         int(i) for i in lines[0].removeprefix("seeds: ").split()
     )
-    mappings: list[Mapping] = []
-    curr_submappings: list[SubMapping] = []
+    submappings: list[SubMapping] = []
+    curr_submappings_parts: list[SubMappingPart] = []
     for line in [*lines[1:], ""]:
         if line == "" or "map" in line:
-            if len(curr_submappings) > 0:
-                mappings.append(Mapping(tuple(curr_submappings)))
-                curr_submappings.clear()
+            if len(curr_submappings_parts) > 0:
+                submappings.append(SubMapping(tuple(curr_submappings_parts)))
+                curr_submappings_parts.clear()
             continue
         dst, src, rng = tuple(int(i) for i in line.split())
-        curr_submappings.append(SubMapping(dst, src, rng))
+        curr_submappings_parts.append(SubMappingPart(dst, src, rng))
 
-    assert len(mappings) == len(LEVEL_NAMES) - 1, (len(mappings), len(LEVEL_NAMES))
-    return seeds, tuple(mappings)
-
-
-def part1(seeds: tuple[int, ...], mappings: tuple[Mapping, ...]) -> int:
-    min_result: int | None = None
-    for seed in seeds:
-        curr = seed
-        for mapping in mappings:
-            curr = mapping.forward(curr)
-        if min_result is None or curr < min_result:
-            min_result = curr
-    return min_result
-
-
-def part2(seeds: tuple[int, ...], mappings: tuple[Mapping, ...]):
-    seed_submapping = tuple(
-        SubMapping(dst=start, src=start, rng=rng)
-        for start, rng in zip(seeds[0::2], seeds[1::2])
+    assert len(submappings) == len(LEVEL_NAMES) - 1, (
+        len(submappings),
+        len(LEVEL_NAMES),
     )
+    mapping = Mapping(tuple(submappings))
+    return seeds, mapping
+
+
+def part1(seeds: tuple[int, ...], mapping: Mapping) -> int:
+    return min(mapping.forward(seed) for seed in seeds)
+
+
+def part2(seeds: tuple[int, ...], mapping: Mapping):
+    seeds_start_range: tuple[tuple[int, int], ...] = tuple(zip(seeds[0::2], seeds[1::2]))
     location: int = 0
-    while True:
-        curr = location
-        for mapping in mappings[::-1]:
-            curr = mapping.backward(curr)
-        if any(submapping.contains_source(curr) for submapping in seed_submapping):
-            break
+    seed = mapping.backward(location)
+    while not any(
+        seed_start <= seed < seed_start + seed_range
+        for seed_start, seed_range in seeds_start_range
+    ):
         location += 1
+        seed = mapping.backward(location)
     return location
 
 
 if __name__ == "__main__":
-    seeds, mappings = parse(load_input("input-05.txt"))
-    print(f"Part 1: {part1(seeds, mappings)}")
-    print(f"Part 2: {part2(seeds, mappings)}")  # Only takes 1 minute!
+    seeds, mapping = parse(load_input("input-05.txt"))
+    print(f"Part 1: {part1(seeds, mapping)}")
+    print(f"Part 2: {part2(seeds, mapping)}")  # Only takes 1 minute!
