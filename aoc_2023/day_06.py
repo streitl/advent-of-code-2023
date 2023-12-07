@@ -1,12 +1,9 @@
-from functools import reduce
 from dataclasses import dataclass
+from functools import reduce
 
 import numpy as np
 
 from aoc_2023.utils import load_input
-
-
-type Races = tuple[Race, ...]
 
 
 @dataclass
@@ -15,12 +12,15 @@ class Race:
     distance_record: int
 
 
+Races = tuple[Race, ...]
+
+
 def get_numbers_after_prefix(input: str, prefix: str) -> tuple[int, ...]:
     return tuple(int(i) for i in input.removeprefix(prefix).strip().split())
 
 
 def parse(input: str) -> Races:
-    lines = [l for l in input.split("\n") if len(l) > 0]
+    lines = [line for line in input.split("\n") if len(line) > 0]
     assert len(lines) == 2, lines
     times = get_numbers_after_prefix(lines[0], "Time:")
     records = get_numbers_after_prefix(lines[1], "Distance:")

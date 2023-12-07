@@ -53,6 +53,7 @@ def part2(input: str) -> int:
     return sum(codes)
 
 
-if __name__ == '__main__':
-    print(f"Part 1: {part1(load_input("input-01.txt"))}")
-    print(f"Part 2: {part2(load_input("input-01.txt"))}")
+if __name__ == "__main__":
+    input = load_input("input-01.txt")
+    print(f"Part 1: {part1(input)}")
+    print(f"Part 2: {part2(input)}")

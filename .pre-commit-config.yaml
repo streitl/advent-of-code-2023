@@ -1,0 +1,29 @@
+default_stages: [commit]
+default_language_version:
+  python: python3.12
+
+repos:
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v2.32.2
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        exclude: "^inputs"
+
+  - repo: local
+    hooks:
+      - id: style-python
+        name: Style python
+        language: system
+        entry: bash style.sh --style
+        pass_filenames: true
+        require_serial: true
+        verbose: true
+        types: [python]

@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 
-
 from aoc_2023.utils import load_input
 
 LEVEL_NAMES: tuple[str, ...] = (
@@ -97,7 +96,9 @@ def part1(seeds: tuple[int, ...], mapping: Mapping) -> int:
 
 
 def part2(seeds: tuple[int, ...], mapping: Mapping):
-    seeds_start_range: tuple[tuple[int, int], ...] = tuple(zip(seeds[0::2], seeds[1::2]))
+    seeds_start_range: tuple[tuple[int, int], ...] = tuple(
+        zip(seeds[0::2], seeds[1::2])
+    )
     location: int = 0
     seed = mapping.backward(location)
     while not any(

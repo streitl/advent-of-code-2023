@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Callable
 
 from aoc_2023.utils import load_input
 
@@ -28,8 +27,8 @@ def parse_games(input: str) -> tuple[Game, ...]:
             green = 0
             blue = 0
             for part in draw.split(", "):
-                n, color = part.split(" ")
-                n = int(n)
+                ns, color = part.split(" ")
+                n = int(ns)
                 if color == "red":
                     red = n
                 elif color == "green":

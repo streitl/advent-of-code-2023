@@ -6,7 +6,7 @@ import numpy.typing as npt
 from aoc_2023.utils import load_input
 
 
-def parse_engine(input: str) -> npt.NDArray[str]:
+def parse_engine(input: str) -> npt.NDArray[np.object_]:
     return np.array([list(line) for line in input.split("\n")])
 
 
@@ -23,12 +23,12 @@ NEIGHBOR_INDICES: tuple[tuple[int, int], ...] = (
 
 
 def get_all_neighbor_values(
-    engine: npt.NDArray[str], row: int, col: int
+    engine: npt.NDArray[np.object_], row: int, col: int
 ) -> frozenset[str]:
     nrows, ncols = engine.shape
     return frozenset(
         [
-            engine[row + r, col + c]
+            str(engine[row + r, col + c])
             for r, c in NEIGHBOR_INDICES
             if 0 <= row + r < nrows and 0 <= col + c < ncols
         ]
@@ -40,7 +40,7 @@ base_symbols: frozenset[str] = frozenset(
 )
 
 
-def part1(engine: npt.NDArray[str]) -> int:
+def part1(engine: npt.NDArray[np.object_]) -> int:
     parts_of_sum: list[int] = []
     nrows, ncols = engine.shape
     for r in range(nrows):
@@ -64,7 +64,7 @@ def part1(engine: npt.NDArray[str]) -> int:
     return sum(parts_of_sum)
 
 
-def part2(engine: npt.NDArray[str]) -> int:
+def part2(engine: npt.NDArray[np.object_]) -> int:
     engine_neighbors: dict[tuple[int, int], list[int]] = defaultdict(list)
     nrows, ncols = engine.shape
     for r in range(nrows):
