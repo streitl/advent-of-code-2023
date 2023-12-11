@@ -21,9 +21,7 @@ def find_distance_between_all_galaxies(
     empty_cols = set(range(n_cols)) - cols_with_galaxies
     distances: list[int] = []
     for i, (ya, xa) in enumerate(galaxies):
-        for j, (yb, xb) in enumerate(galaxies):
-            if j <= i:
-                continue
+        for yb, xb in galaxies[i + 1 :]:
             rows_in_between = set(range(min(ya, yb), max(ya, yb)))
             cols_in_between = set(range(min(xa, xb), max(xa, xb)))
 
