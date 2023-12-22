@@ -10,6 +10,7 @@ python = "^3.12"
 black = "^23.11.0"
 numpy = "^1.26.2"
 tqdm = "^4.66.1"
+types-tqdm = "^4.66.0.5"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.10.0"
